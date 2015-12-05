@@ -14,6 +14,7 @@
   <div id="map"></div>
 
   <script>
+    var year=2010
   
     // initialize the map
     var map = L.map('map').setView([40.778, -73.942], 11);
@@ -25,19 +26,39 @@
     }).addTo(map);
 
     // load geojson layer
-    function addDataToMap(data, map) {
-      var dataLayer = L.geoJson(data, {
+    function addDataToMap(geojsondata, zipcodedata, map) {
+      var dataLayer = L.geoJson(geojsondata, {
         onEachFeature: function(feature, layer){
 
         },
         style: function(feature){
-          return {color: '#000000'}
+          return getFeatureStyle(feature, zipcodedata, year)
         }
       });
       dataLayer.addTo(map);
     }
 
-    $.getJSON("neighborhoods.geojson", function(data) { addDataToMap(data, map); });
+    $.getJSON("neighborhoods.geojson", function(geojsondata) { 
+      $.getJSON("zipcode-data.json", function(zipcodedata) {
+        addDataToMap(geojsondata, zipcodedata, map); 
+      });
+    });
+
+    function getFeatureStyle(feature, zipcodedata, year){
+      var targetZip = feature.properties.postalCode;
+      var records = zipcodedata.alldata;
+
+      for (var i in records) {
+        if (targetZip == records[i].zip) {
+          for (var j in records[i].data){
+            if (records[i].data[j].year == year)
+              console.log(records[i].data[j].complaint_count)
+          }
+        }
+      }
+      //console.log(zipcodedata.type)
+      return {color: '#000000'}
+    }
 
 
   </script>
