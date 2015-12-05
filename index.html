@@ -38,15 +38,15 @@
       dataLayer.addTo(map);
     }
 
-    $.getJSON("neighborhoods.geojson", function(geojsondata) { 
-      $.getJSON("zipcode-data.json", function(zipcodedata) {
-        addDataToMap(geojsondata, zipcodedata, map); 
+    $.getJSON("data/neighborhoods.geojson", function(geojsondata) { 
+      $.getJSON("data/jointdata.json", function(jointdata) {
+        addDataToMap(geojsondata, jointdata, map); 
       });
     });
 
-    function getFeatureStyle(feature, zipcodedata, year){
+    function getFeatureStyle(feature, jointdata, year){
       var targetZip = feature.properties.postalCode;
-      var records = zipcodedata.alldata;
+      var records = jointdata.alldata;
 
       for (var i in records) {
         if (targetZip == records[i].zip) {
@@ -57,7 +57,18 @@
         }
       }
       //console.log(zipcodedata.type)
-      return {color: '#000000'}
+      return {
+        fillColor: getColor()
+        weight: 2,
+        color: '#000000'}
+    }
+
+    // chloropleth
+    function getColor(density) {
+      var color = d3.scale.linear() // create a linear scale
+        .domain([0, 4100])  // input uses min and max values
+        .range([.1,1]);   // output for opacity between .3 and 1 %
+      return color(density);  // return that number to the caller
     }
 
 
