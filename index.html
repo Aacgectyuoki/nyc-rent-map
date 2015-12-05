@@ -4,6 +4,7 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
   <link rel='stylesheet' href='jquery-ui.min.css'/>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script src="jquery-ui.min.js"></script>
 
@@ -41,6 +42,8 @@
 
     function yearChanged(year){
       console.log(year)
+      year = year;
+      
     }
 
     // load a tile layer
@@ -70,28 +73,40 @@
 
     function getFeatureStyle(feature, jointdata, year){
       var targetZip = feature.properties.postalCode;
-      var records = jointdata.alldata;
-
+      var records = jointdata.features;
+      var complaint_count=0;
       for (var i in records) {
-        if (targetZip == records[i].zip) {
+        if (targetZip == records[i].zipcode) {
           for (var j in records[i].data){
-            if (records[i].data[j].year == year)
-              console.log(records[i].data[j].complaint_count)
+            if (records[i].data[j].year == year) {
+              complaint_count = records[i].data[j].complaint_count;
+            }
           }
-        }
+        } 
       }
       //console.log(zipcodedata.type)
+      // return {
+      //   weight: 2,
+      //   color: '#000000'}
+      if (complaint_count >0){
+        return { 
+          weight: 2,
+          // color: '#000000',
+          fillOpacity: getColor(complaint_count)
+        };
+      }
       return {
-        fillColor: getColor()
-        weight: 2,
-        color: '#000000'}
+        weight:2,
+        fillColor: '#ffa500'
+      }
     }
 
     // chloropleth
     function getColor(density) {
       var color = d3.scale.linear() // create a linear scale
-        .domain([0, 4100])  // input uses min and max values
+        .domain([0, 3000])  // input uses min and max values
         .range([.1,1]);   // output for opacity between .3 and 1 %
+        console.log(color(density))
       return color(density);  // return that number to the caller
     }
 
