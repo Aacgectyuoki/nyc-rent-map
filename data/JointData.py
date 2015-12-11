@@ -98,6 +98,14 @@ print(mdata.dtypes)
 merge_data = pd.merge(data, mdata, how = 'inner', on = ['zipcode', 'year'])
 merge_data.head()
 
+# solve Infinity problem
+ind = np.where(np.isinf(merge_data['Pstabilized']))
+
+merge_data.iloc[255]
+merge_data.drop(merge_data.index[np.where(np.isinf(merge_data['Pstabilized']))], inplace = True)
+ind = np.where(np.isinf(merge_data['Pstabilized']))
+merge_data.to_csv('jointdata.csv')
+
 
 # In[53]:
 
