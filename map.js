@@ -62,7 +62,7 @@
     }
 
     function render(year){
-      $.getJSON("data/neighborhoods.geojson", function(geojsondata) { 
+      $.getJSON("data/neighborhoods.geojson", function(geojsondata) {
         $.getJSON("data/dataZipcodeIndexed.json", function(jointdata) {
           if (dataLayer!=undefined){
             map.removeLayer(dataLayer);
@@ -72,36 +72,46 @@
       });
     }
 
-    function getFeatureStyle(feature, jointdata, year, query){
+    function getFeatureStyle(feature, records, year, query){
       var targetZip = feature.properties.postalCode;
-      var records = jointdata.features;
-      console.log(records)
+      // console.log(records)
       var key=0;
-      //console.log(query)
-      //console.log("year:", year)
 
-      if (query==0){ //complaints
-        for (var i in records) {
-          if (targetZip == records[i].zipcode) {
-            for (var j in records[i].data){
-              if (records[i].data[j].year == year) {
-                key = records[i].data[j].complaint_count;
-              }
-            }
-          } 
+      var zipData = records[targetZip];
+
+      if (zipData) {
+        // console.log(zipData)
+        for (var i = 0; i < zipData.length; i++) {
+          console.log(Math.floor(zipData[i].year))
+          console.log('year', year)
+          if (Math.floor(zipData[i].year) == year) {
+            console.log('GOT INTO IF')
+          }
         }
       }
-      else{ // rent stabilization
-        for (var i in records) {
-          if (targetZip == records[i].zipcode) {
-            for (var j in records[i].data){
-              if (records[i].data[j].year == year) {
-                key = records[i].data[j].number_stabilized;
-              }
-            }
-          } 
-        }
-      }  
+
+      // if (query==0){ //complaints
+      //   for (var i in records) {
+      //     if (targetZip == records[i].zipcode) {
+      //       for (var j in records[i].data){
+      //         if (records[i].data[j].year == year) {
+      //           key = records[i].data[j].complaint_count;
+      //         }
+      //       }
+      //     } 
+      //   }
+      // }
+      // else{ // rent stabilization
+      //   for (var i in records) {
+      //     if (targetZip == records[i].zipcode) {
+      //       for (var j in records[i].data){
+      //         if (records[i].data[j].year == year) {
+      //           key = records[i].data[j].number_stabilized;
+      //         }
+      //       }
+      //     } 
+      //   }
+      // }  
       //console.log(zipcodedata.type)
       // return {
       //   weight: 2,

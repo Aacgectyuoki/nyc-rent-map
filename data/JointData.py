@@ -104,8 +104,6 @@ ind = np.where(np.isinf(merge_data['Pstabilized']))
 merge_data.iloc[255]
 merge_data.drop(merge_data.index[np.where(np.isinf(merge_data['Pstabilized']))], inplace = True)
 ind = np.where(np.isinf(merge_data['Pstabilized']))
-merge_data.to_csv('jointdata.csv')
-
 
 # In[53]:
 
@@ -122,7 +120,7 @@ for zc in np.unique(merge_data['zipcode'].values):
       entry['complaint_count'] = row['complaint_count']
       entry['percent_stabilized'] = row['Pstabilized']
       entry['number_stabilized'] = row['Nstabilized']
-        
+
       data[zc].append(entry)
 
 
