@@ -74,7 +74,7 @@ mdata.head()
 
 # In[38]:
 
-data = pd.read_csv('data/311_Heat_Seek_Subset.csv', 
+data = pd.read_csv('311_Heat_Seek_Subset.csv', 
                    usecols = [1, 5, 8], header = None)
 data.rename(columns = {1: 'year', 5: 'complaint_type', 8: 'zipcode'}, inplace = True)
 data['year'] = data['year'].apply(lambda x: x[6:10])
@@ -121,7 +121,7 @@ for zc in np.unique(merge_data['zipcode'].values):
 # In[57]:
 
 with open('jointdata2.json', 'w') as f:
-    json.dump(output_json, f)
+    json.dump(data, f)
 
 
 # In[ ]:
