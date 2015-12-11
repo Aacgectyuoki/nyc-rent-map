@@ -101,30 +101,26 @@ merge_data.head()
 
 # In[53]:
 
-output_json = {}
-output_json['type'] = 'zipcode_data_collection'
-output_json['features'] = []
+data = {}
 
 for zc in np.unique(merge_data['zipcode'].values):
+    data[zc] = []
     entry = {}
-    entry['zipcode'] = zc
     
-    entry['data'] = []
+    # entry[zc] = []
     hold = merge_data[merge_data.zipcode == zc]
     for ind, row in hold.iterrows():
-        data_entry = {}
-        data_entry['year'] = row['year']
-        data_entry['complaint_count'] = row['complaint_count']
-        data_entry['percent_stabilized'] = row['Pstabilized']
-        data_entry['number_stabilized'] = row['Nstabilized']
-        entry['data'].append(data_entry)
+      entry['year'] = row['year']
+      entry['complaint_count'] = row['complaint_count']
+      entry['percent_stabilized'] = row['Pstabilized']
+      entry['number_stabilized'] = row['Nstabilized']
         
-    output_json['features'].append(entry)
+      data[zc].append(entry)
 
 
 # In[57]:
 
-with open('jointdata.json', 'w') as f:
+with open('jointdata2.json', 'w') as f:
     json.dump(output_json, f)
 
 
