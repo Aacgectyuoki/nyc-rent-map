@@ -38,7 +38,6 @@
     function yearChanged(year){
       //console.log(year);
       gyear = year;
-      map.removeLayer(dataLayer);
       render(gyear);
     }
 
@@ -64,10 +63,13 @@
     function render(year){
       $.getJSON("data/neighborhoods.geojson", function(geojsondata) {
         $.getJSON("data/jointdata.json", function(jointdata) {
-          if (dataLayer!=undefined){
-            map.removeLayer(dataLayer);
-          }
-          addDataToMap(geojsondata, jointdata, map, year); 
+          var oldDataLayer = dataLayer;
+          addDataToMap(geojsondata, jointdata, map, year);
+          if (oldDataLayer!=undefined){
+            console.log('old',oldDataLayer)
+            console.log('current',dataLayer)
+            map.removeLayer(oldDataLayer); 
+          }  
         });
       });
     }
