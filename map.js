@@ -4,6 +4,16 @@
    // var query= 1 //"stabilized"
     var query=0; //"complaint"
 
+    var defaultStyle = {
+      color: 'black', 
+      weight: 1,
+    }
+
+    var hoverStyle = {
+      color: 'black', 
+      weight: 3,
+    }
+
     // initialize the map
     var map = L.map('map').setView([40.778, -73.942], 11);
     $(function() {
@@ -51,7 +61,14 @@
     function addDataToMap(geojsondata, zipcodedata, map, year, query) {
       dataLayer = L.geoJson(geojsondata, {
         onEachFeature: function(feature, layer){
-
+          // popup information about the demographic of the zipcode
+          layer.bindPopup("hello hi")
+          layer.on('mouseover', function (e){
+            layer.setStyle(hoverStyle);
+          });
+          layer.on('mouseout', function (e){
+            layer.setStyle(defaultStyle);
+          });
         },
         style: function(feature){
           return getFeatureStyle(feature, zipcodedata, year, query)
