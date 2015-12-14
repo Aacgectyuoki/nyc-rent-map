@@ -48,7 +48,7 @@
     }).addTo(map);
 
     // load geojson layer
-    function addDataToMap(geojsondata, zipcodedata, map, year) {
+    function addDataToMap(geojsondata, zipcodedata, map, year, query) {
       dataLayer = L.geoJson(geojsondata, {
         onEachFeature: function(feature, layer){
 
@@ -64,7 +64,8 @@
       $.getJSON("data/neighborhoods.geojson", function(geojsondata) {
         $.getJSON("data/jointdata.json", function(jointdata) {
           var oldDataLayer = dataLayer;
-          addDataToMap(geojsondata, jointdata, map, year);
+          addDataToMap(geojsondata, jointdata, map, year, query);
+          
           if (oldDataLayer!=undefined){
             console.log('old',oldDataLayer)
             console.log('current',dataLayer)
@@ -96,7 +97,7 @@
           if (targetZip == records[i].zipcode) {
             for (var j in records[i].data){
               if (records[i].data[j].year == year) {
-                key = records[i].data[j].number_stabilized;
+                key = records[i].data[j].percent_stabilized;
               }
             }
           } 
@@ -112,7 +113,7 @@
           color: '#000000',
           opacity: 0.3,
           fillColor: '#bc0b0b',
-          fillOpacity: getColor(key)
+          fillOpacity: getColorComplaints(key)
         };
       }
       else if (key >0 && query==1){
@@ -121,7 +122,7 @@
           color: '#000000',
           opacity: 0.3,
           fillColor: '#088989',
-          fillOpacity: getColor(key)
+          fillOpacity: getColorRent(key)
         };
       }
       return {
@@ -130,11 +131,11 @@
       }
     }
 
-    // chloropleth
-    function getColor(density) {
-      var color = d3.scale.linear() // create a linear scale
-        .domain([0, 5000])  // input uses min and max values
-        .range([.1,1]);   // output for opacity between .3 and 1 %
-        console.log(color(density))
-      return color(density);  // return that number to the caller
+    function getColorComplaints(density) {
+      // in the 4000's is highest number
+      return density/5000;
+    }
+
+    function getColorRent(density) {
+      return density;
     }
