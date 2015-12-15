@@ -74,7 +74,7 @@ mdata.head()
 
 # In[38]:
 
-data = pd.read_csv('data/311_Heat_Seek_Subset.csv', 
+data = pd.read_csv('311_Heat_Seek_Subset.csv', 
                    usecols = [1, 5, 8], header = None)
 data.rename(columns = {1: 'year', 5: 'complaint_type', 8: 'zipcode'}, inplace = True)
 data['year'] = data['year'].apply(lambda x: x[6:10])
@@ -98,34 +98,36 @@ print(mdata.dtypes)
 merge_data = pd.merge(data, mdata, how = 'inner', on = ['zipcode', 'year'])
 merge_data.head()
 
+# solve Infinity problem
+ind = np.where(np.isinf(merge_data['Pstabilized']))
+
+merge_data.iloc[255]
+merge_data.drop(merge_data.index[np.where(np.isinf(merge_data['Pstabilized']))], inplace = True)
+ind = np.where(np.isinf(merge_data['Pstabilized']))
 
 # In[53]:
 
-output_json = {}
-output_json['type'] = 'zipcode_data_collection'
-output_json['features'] = []
+data = {}
 
 for zc in np.unique(merge_data['zipcode'].values):
+    data[zc] = []
     entry = {}
-    entry['zipcode'] = zc
     
-    entry['data'] = []
+    # entry[zc] = []
     hold = merge_data[merge_data.zipcode == zc]
     for ind, row in hold.iterrows():
-        data_entry = {}
-        data_entry['year'] = row['year']
-        data_entry['complaint_count'] = row['complaint_count']
-        data_entry['percent_stabilized'] = row['Pstabilized']
-        data_entry['number_stabilized'] = row['Nstabilized']
-        entry['data'].append(data_entry)
-        
-    output_json['features'].append(entry)
+      entry['year'] = row['year']
+      entry['complaint_count'] = row['complaint_count']
+      entry['percent_stabilized'] = row['Pstabilized']
+      entry['number_stabilized'] = row['Nstabilized']
+
+      data[zc].append(entry)
 
 
 # In[57]:
 
-with open('jointdata.json', 'w') as f:
-    json.dump(output_json, f)
+with open('jointdata2.json', 'w') as f:
+    json.dump(data, f)
 
 
 # In[ ]:
