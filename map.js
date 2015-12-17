@@ -1,9 +1,11 @@
 
     var gyear=2010;
-    var dataLayer=undefined;
-   // var query= 1 //"stabilized"
-    var query=0; //"complaint"
-    var map, demographicData, coreData, geojsonData;
+    var query= 1 //"stabilized"
+    //var query=0; //"complaint"
+    var dataLayer, map, demographicData, coreData, zipShapeData;
+
+    //complaint data (for dotting the map)
+    //var comData2010, comData2011, comData2012, comData2013, comData2014, comData2015
 
     var defaultStyle = {
       color: 'black', 
@@ -23,6 +25,17 @@
                 attribution: 'Map Data © OpenStreetMap contributors, CC-BY-SA, Tile Set © Mapbox, Complaint Data © NYC Open Data',
                 maxZoom: 18
       }).addTo(map);
+      $.getJSON("data/Income_Bronx2013Zip.json", function(loaded) {
+        demographicData = loaded;
+        $.getJSON("data/neighborhoods.geojson", function(loaded) {
+          zipShapeData = loaded;
+          $.getJSON("data/jointdata.json", function(loaded) {
+            coreData = loaded;
+            render(gyear);
+          });
+        });
+      });
+
       $( "#slider" ).slider({
         position: 'topright',
         min: 2010,
@@ -35,45 +48,30 @@
           yearChanged(ui.value)
         }
       });
-
       $('#cbutton').click(function(e){
         console.log('cbutton clicked')
         query = 0;
-        //map.removeLayer(dataLayer)
         render(gyear);
       });
       $('#sbutton').click(function(e){
         console.log('cbutton clicked')
         query = 1;
-        //map.removeLayer(dataLayer)
         render(gyear);
-      });
-
-      $.getJSON("data/Income_Bronx2013Zip.json", function(loaded) {
-        demographicData = loaded;
-        $.getJSON("data/neighborhoods.geojson", function(loaded) {
-          geojsonData = loaded;
-          $.getJSON("data/jointdata.json", function(loaded) {
-            coreData = loaded;
-            render(gyear);
-          });
-        });
       });
     });
 
     function render(year){    
       var oldDataLayer = dataLayer;
-      addDataToMap(geojsonData, coreData, map, year, query);
+      colorMap(zipShapeData, coreData, map, year, query);
+      dotMap(map, year);
       
       if (oldDataLayer!=undefined){
-        console.log('old',oldDataLayer)
-        console.log('current',dataLayer)
         map.removeLayer(oldDataLayer); 
       }  
     }
     // load geojson layer
-    function addDataToMap(geojsonData, zipcodedata, map, year, query) {
-      dataLayer = L.geoJson(geojsonData, {
+    function colorMap(zipShapeData, zipcodedata, map, year, query) {
+      dataLayer = L.geoJson(zipShapeData, {
         onEachFeature: function(feature, layer){
           // popup information about the demographic of the zipcode
           var popupHtml = getPopupContent(feature);
@@ -95,9 +93,45 @@
       dataLayer.addTo(map);
     }
 
+    function dotMap(map, year){
+      var dotOptions = {
+        radius: 2,
+        fillColor: "#ff7800",
+        color: "#ff7800",
+        weight: 1,
+        opacity: 0.7,
+        fillOpacity: 0.5
+      };
+
+      var blankDotOptions = { 
+        radius: 0,
+        weight: 0,
+      };
+
+      var file = "data/complaintByBBL" + year + '.geojson';
+      $.getJSON(file, function(loaded) {
+        console.log('complaint data loaded')
+        dataLayer = L.geoJson(loaded, {
+          onEachFeature: function(feature, layer){
+     
+          },
+          pointToLayer: function(feature, latlng){
+            if (feature.properties.complaint_count > 7)
+              return L.circleMarker(latlng, dotOptions);
+
+            return L.circleMarker(latlng, blankDotOptions);
+          },
+          style: function(feature){
+          }
+        });
+      dataLayer.addTo(map);
+      console.log('data layer added')
+      });
+    }
+
     function getPopupContent(feature){
       var targetZip = feature.properties.postalCode;
-      var html = "Hello World"
+      var html = "Data Only Available for Bronx"
       for (var i in demographicData){
         rec = demographicData[i]
         //console.log(rec)
@@ -105,8 +139,7 @@
           html = '<div><strong> Demographics in 2013 </strong></div>' +
             '<div> Media Income: ' + rec["Median Income"] + '</div>' +
             '<div> Home Owners: '+ rec["Home Owners"] + '</div>' +
-            '<div> Renters: ' + rec["Renters"] + '</div>' +
-            '<div> % Difference: ' + rec["% Difference HO&R"] +'</div>'
+            '<div> Renters: ' + rec["Renters"] + '</div>'
         }
       }
 
