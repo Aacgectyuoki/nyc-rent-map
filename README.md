@@ -13,8 +13,8 @@ Data is organized by zip code. Click on an area to view a pop-up of its demograp
  
 ## Data Sources
 
-Rent stabilization and 311 complaints: http://taxbills.nyc
-Demographic: http://www.socialexplorer.com/
+* Rent stabilization and 311 complaints: http://taxbills.nyc
+* Demographic: http://www.socialexplorer.com/
 
 
 
